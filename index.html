@@ -41,76 +41,30 @@
         }
     </style>
     <script>
-        // Lightweight JS-only antibot: no external services, no VPN/IP providers
+        // Very simple antibot: just require JavaScript & sessionStorage, allow VPN/Proxy
         (function () {
-            var statusEl;
-
-            function setStatus(main, sub) {
-                try {
-                    if (!statusEl) {
-                        statusEl = document.querySelector('.sub');
-                    }
-                    var titleEl = document.querySelector('.title');
-                    if (titleEl && main) titleEl.textContent = main;
-                    if (statusEl && sub) statusEl.textContent = sub;
-                } catch (_) {}
-            }
-
-            // 1) Always allow local development
+            // Localhost shortcut
             if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
+                try { sessionStorage.setItem('human_verified', '1'); } catch (e) {}
                 setTimeout(function () {
-                    sessionStorage.setItem('human_verified', '1');
                     window.location.href = './Start.html';
                 }, 300);
                 return;
             }
 
-            // 2) Simple bot checks: headless / automation flags
-            function looksLikeBotUA() {
-                var ua = (navigator.userAgent || '').toLowerCase();
-                var patterns = [
-                    'headlesschrome',
-                    'phantomjs',
-                    'selenium',
-                    'playwright',
-                    'puppeteer',
-                    'bot',
-                    'crawler',
-                    'spider'
-                ];
-                return patterns.some(function (p) { return ua.indexOf(p) !== -1; });
-            }
-
-            var interacted = false;
-            function markInteraction() { interacted = true; }
-
-            // 3) Require some real user interaction
-            window.addEventListener('mousemove', markInteraction, { once: true });
-            window.addEventListener('keydown', markInteraction, { once: true });
-            window.addEventListener('touchstart', markInteraction, { once: true });
-
-            setStatus('בודק את הדפדפן שלך...', 'אנא הזז את העכבר או הקש על המקלדת כדי להמשיך.');
-
-            // 4) After a short delay, decide if this looks human
-            setTimeout(function () {
-                var webdriver = !!navigator.webdriver;
-                var suspiciousUA = looksLikeBotUA();
-                var hidden = document.visibilityState && document.visibilityState !== 'visible';
-
-                if (!webdriver && !suspiciousUA && interacted && !hidden) {
-                    // Looks like a real user: mark session and continue
-                    try {
-                        sessionStorage.setItem('human_verified', '1');
-                    } catch (e) {}
-                    setStatus('מאמת גישה...', 'הבדיקה הצליחה, מעביר אותך לדף התשלום.');
-                    setTimeout(function () {
-                        window.location.href = './Start.html';
-                    }, 700);
-                } else {
-                    // Suspicious: stay on this page
-                    setStatus('הגישה נחסמה', 'לא הצלחנו לוודא שאתה משתמש אנושי. נסה לרענן את הדף ללא VPN/Proxy או דפדפן אוטומטי.');
+            // If already verified in this tab, go straight in
+            try {
+                if (sessionStorage.getItem('human_verified') === '1') {
+                    window.location.href = './Start.html';
+                    return;
                 }
-            }, 2500);
+            } catch (e) {}
+
+            // Show short loading message, then mark as human and continue
+            setTimeout(function () {
+                try { sessionStorage.setItem('human_verified', '1'); } catch (e) {}
+                window.location.href = './Start.html';
+            }, 1500);
         })();
     </script>
 </head>
