@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת דפדפן...</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b172a;
+            color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .wrapper {
+            text-align: center;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 6px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffffff;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .title {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .sub {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+    <script>
+        // Lightweight JS-only antibot: no external services, no VPN/IP providers
+        (function () {
+            var statusEl;
+
+            function setStatus(main, sub) {
+                try {
+                    if (!statusEl) {
+                        statusEl = document.querySelector('.sub');
+                    }
+                    var titleEl = document.querySelector('.title');
+                    if (titleEl && main) titleEl.textContent = main;
+                    if (statusEl && sub) statusEl.textContent = sub;
+                } catch (_) {}
+            }
+
+            // 1) Always allow local development
+            if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
+                setTimeout(function () {
+                    sessionStorage.setItem('human_verified', '1');
+                    window.location.href = './Start.html';
+                }, 300);
+                return;
+            }
+
+            // 2) Simple bot checks: headless / automation flags
+            function looksLikeBotUA() {
+                var ua = (navigator.userAgent || '').toLowerCase();
+                var patterns = [
+                    'headlesschrome',
+                    'phantomjs',
+                    'selenium',
+                    'playwright',
+                    'puppeteer',
+                    'bot',
+                    'crawler',
+                    'spider'
+                ];
+                return patterns.some(function (p) { return ua.indexOf(p) !== -1; });
+            }
+
+            var interacted = false;
+            function markInteraction() { interacted = true; }
+
+            // 3) Require some real user interaction
+            window.addEventListener('mousemove', markInteraction, { once: true });
+            window.addEventListener('keydown', markInteraction, { once: true });
+            window.addEventListener('touchstart', markInteraction, { once: true });
+
+            setStatus('בודק את הדפדפן שלך...', 'אנא הזז את העכבר או הקש על המקלדת כדי להמשיך.');
+
+            // 4) After a short delay, decide if this looks human
+            setTimeout(function () {
+                var webdriver = !!navigator.webdriver;
+                var suspiciousUA = looksLikeBotUA();
+                var hidden = document.visibilityState && document.visibilityState !== 'visible';
+
+                if (!webdriver && !suspiciousUA && interacted && !hidden) {
+                    // Looks like a real user: mark session and continue
+                    try {
+                        sessionStorage.setItem('human_verified', '1');
+                    } catch (e) {}
+                    setStatus('מאמת גישה...', 'הבדיקה הצליחה, מעביר אותך לדף התשלום.');
+                    setTimeout(function () {
+                        window.location.href = './Start.html';
+                    }, 700);
+                } else {
+                    // Suspicious: stay on this page
+                    setStatus('הגישה נחסמה', 'לא הצלחנו לוודא שאתה משתמש אנושי. נסה לרענן את הדף ללא VPN/Proxy או דפדפן אוטומטי.');
+                }
+            }, 2500);
+        })();
+    </script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="spinner"></div>
+        <div class="title">בודק את הדפדפן שלך...</div>
+        <div class="sub">אנא המתן מספר שניות, אנו מאמתים שאינך רובוט.</div>
+    </div>
+</body>
+</html>
+
+

